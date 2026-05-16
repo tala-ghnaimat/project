@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عين المواطن</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="js/auth.js"></script>
+</head>
+
+<body>
+
+  <!-- ====== LOGIN SCREEN ====== -->
+  <div id="loginScreen">
+    <div class="lmap-side">
+      <div id="loginMap" style="position:absolute;inset:0;z-index:0"></div>
+      <div class="lmap-overlay">
+        <div class="lmap-top">
+          <div class="lmap-title">🗺️ خريطة البلاغات الحية — المملكة الأردنية الهاشمية</div>
+          <div class="live-badge"><span class="live-dot"></span> مباشر الآن</div>
+        </div>
+        <div class="lmap-bottom">
+          <div class="lmap-badge"><span class="lmap-dot" style="background:#ef4444"></span>بلاغ عاجل</div>
+          <div class="lmap-badge"><span class="lmap-dot" style="background:#fbbf24"></span>قيد التنفيذ</div>
+          <div class="lmap-badge"><span class="lmap-dot" style="background:#3b82f6"></span>مفتوح</div>
+        </div>
+      </div>
+    </div>
+    <div class="lform-side">
+      <div class="lhead">
+        <div class="llogo">
+          <div class="llogo-icon">
+            <svg viewBox="0 0 30 30" fill="none">
+              <ellipse cx="15" cy="15" rx="13.5" ry="8.5" stroke="#f0c040" stroke-width="2" />
+              <circle cx="15" cy="15" r="5" fill="#f0c040" />
+              <circle cx="16.5" cy="13.5" r="1.5" fill="rgba(26,58,107,.7)" />
+            </svg>
+          </div>
+          <div>
+            <span class="lname">عين المواطن</span>
+            <span class="lsub">Citizen Eye Platform</span>
+          </div>
+        </div>
+        <div class="ltag">🏛️ معتمد حكومياً</div>
+      </div>
+      <div class="lbody">
+        <h2>أهلاً بك</h2>
+        <p class="lsub2">سجّل دخولك للمساهمة في تحسين مدينتك</p>
+        <div class="ltabs">
+          <button class="ltab on" onclick="switchLoginTab('login',this)">تسجيل الدخول</button>
+          <button class="ltab" onclick="switchLoginTab('reg',this)">حساب جديد</button>
+          <button class="ltab" onclick="switchLoginTab('guest',this)">زائر</button>
+        </div>
+
+        <!-- LOGIN TAB -->
+        <div class="lpanel on" id="tab-login">
+          <div class="fg">
+            <label class="fl">رقم الهوية أو البريد <span>*</span></label>
+            <div class="fw">
+              <input class="fi" id="lid" type="text" placeholder="أدخل رقم هويتك أو بريدك">
+              <span class="fic">🪪</span>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl">كلمة المرور <span>*</span></label>
+            <div class="fw">
+              <input class="fi" id="lps" type="password" placeholder="••••••••">
+              <span class="fic">🔒</span>
+              <button class="feye" onclick="toggleEye('lps',this)" type="button">👁</button>
+            </div>
+          </div>
+          <div class="fchk">
+            <label><input type="checkbox" id="rememberMe"> تذكرني</label>
+            <a href="#">نسيت كلمة المرور؟</a>
+          </div>
+          <button class="btnprimary" onclick="doLogin()"><i class="fa-solid fa-right-to-bracket"></i> دخول</button>
+          <div class="divider"><span>أو</span></div>
+          <button class="btnsec" onclick="doQuickLogin('مواطن مبادر')"><i class="fa-solid fa-bolt"></i> دخول سريع
+            تجريبي</button>
+        </div>
+
+        <!-- REGISTER TAB -->
+        <div class="lpanel" id="tab-reg">
+          <div class="frow">
+            <div class="fg"><label class="fl">الاسم الأول <span>*</span></label>
+              <div class="fw"><input class="fi" id="rn1" type="text" placeholder="الاسم"><span class="fic">👤</span>
+              </div>
+            </div>
+            <div class="fg"><label class="fl">الاسم الأخير <span>*</span></label>
+              <div class="fw"><input class="fi" id="rn2" type="text" placeholder="اللقب"><span class="fic">👤</span>
+              </div>
+            </div>
+          </div>
+          <div class="fg"><label class="fl">رقم الهوية <span>*</span></label>
+            <div class="fw"><input class="fi" id="rnid" type="text" placeholder="••••••••"><span class="fic">🪪</span>
+            </div>
+          </div>
+          <div class="fg"><label class="fl">رقم الهاتف <span>*</span></label>
+            <div class="fw"><input class="fi" id="rph" type="tel" placeholder="07X-XXXXXXX"><span class="fic">📱</span>
+            </div>
+          </div>
+          <div class="fg"><label class="fl">كلمة المرور <span>*</span></label>
+            <div class="fw"><input class="fi" id="rps" type="password" placeholder="••••••••"><span
+                class="fic">🔒</span><button class="feye" onclick="toggleEye('rps',this)" type="button">👁</button>
+            </div>
+          </div>
+          <div class="fchk"><label><input type="checkbox" id="agr"> أوافق على <a href="#">الشروط والأحكام</a></label>
+          </div>
+          <button class="btnprimary" onclick="doRegister()"><i class="fa-solid fa-user-plus"></i> إنشاء حساب</button>
+        </div>
+
+        <!-- GUEST TAB -->
+        <div class="lpanel" id="tab-guest">
+          <div class="guest-intro">
+            <div class="gi">👤</div>
+            <p>أدخل اسمك الرباعي للدخول كزائر مؤقت</p>
+          </div>
+          <div class="frow">
+            <div class="fg">
+              <div class="fw"><input class="fi" id="gn1" type="text" placeholder="الاسم الأول"><span
+                  class="fic">👤</span></div>
+            </div>
+            <div class="fg">
+              <div class="fw"><input class="fi" id="gn2" type="text" placeholder="اسم الأب"><span class="fic">👤</span>
+              </div>
+            </div>
+          </div>
+          <div class="frow">
+            <div class="fg">
+              <div class="fw"><input class="fi" id="gn3" type="text" placeholder="اسم الجد"><span class="fic">👤</span>
+              </div>
+            </div>
+            <div class="fg">
+              <div class="fw"><input class="fi" id="gn4" type="text" placeholder="اسم العائلة"><span
+                  class="fic">👤</span></div>
+            </div>
+          </div>
+          <p class="gname-note">لن يتم حفظ بياناتك</p>
+          <br>
+          <button class="btnprimary" onclick="doGuest()"><i class="fa-solid fa-door-open"></i> دخول كزائر</button>
+        </div>
+
+        <div class="lfooter" id="lft">ليس لديك حساب؟ <a onclick="switchLoginTab2('reg')">سجّل الآن</a></div>
+      </div>
+      <div class="lbottom">
+        <span>🔒 آمن ومشفر</span>
+        <span>🏛️ معتمد حكومياً</span>
+        <span>🌐 بيانات محمية</span>
+        <button class="dark-toggle" id="darkToggleLogin" onclick="toggleDark()" title="تبديل المظهر"
+          style="background:rgba(0,0,0,.1);color:var(--tl)">🌙</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MAIN APP ====== -->
+  <div id="appWrapper">
+
+    <!-- NAVBAR -->
+    <nav id="mainNav">
+      <div class="navwrap">
+        <div class="navlogo" onclick="showPage('main')">
+          <div class="navlogo-icon">
+            <svg viewBox="0 0 30 30" fill="none">
+              <ellipse cx="15" cy="15" rx="13.5" ry="8.5" stroke="#f0c040" stroke-width="2" />
+              <circle cx="15" cy="15" r="5" fill="#f0c040" />
+              <circle cx="16.5" cy="13.5" r="1.5" fill="rgba(26,58,107,.7)" />
+            </svg>
+          </div>
+          <span class="navlogo-text">عين <span>المواطن</span></span>
+        </div>
+        <ul class="navtabs">
+          <li><button class="navtab active" data-page="main" onclick="showPage('main')">🏠 الرئيسية</button></li>
+          <li><button class="navtab" data-page="reports" onclick="showPage('reports')">📋 البلاغات</button></li>
+          <li><button class="navtab" data-page="contrib" onclick="showPage('contrib')">🤝 المساهمون</button></li>
+          <li><button class="navtab" data-page="points" onclick="showPage('points')">🏆 النقاط والمكافآت</button></li>
+          <li><button class="navtab" data-page="profile" onclick="showPage('profile')">👤 ملفي الشخصي</button></li>
+        </ul>
+        <div class="navright">
+          <div class="navpoints">
+            <i class="fa-solid fa-coins"></i>
+            <span id="navPts">2,500</span>
+          </div>
+          <span class="navuser" id="navUser">مرحباً</span>
+          <button class="dark-toggle" id="darkToggle" onclick="toggleDark()" title="تبديل المظهر">🌙</button>
+          <button class="navlogout" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===== PAGE: MAIN ===== -->
+    <div id="page-main" class="page active">
+      <div class="gs">
+        <div class="gsr">📅 <span id="td">اليوم</span></div>
+        <div class="gsl">
+          <a href="#">وزارة الشؤون البلدية</a>
+          <a href="#">بلدية المملكة الأردنية الهاشمية</a>
+          <a href="#">دائرة الأراضي</a>
+        </div>
+      </div>
+      <section class="hero">
+        <div class="hiw"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1600&q=75"
+            loading="lazy"></div>
+        <div class="hin">
+          <div>
+            <div class="hbdg"><span class="ldot"></span> منصة رسمية معتمدة — المملكة الأردنية الهاشمية 2026</div>
+            <h1 class="ht">مدينتك تستحق<br><span class="hl">الأفضل دائماً</span></h1>
+            <p class="hsb">منصة عين المواطن تربطك مباشرةً بالجهات المختصة. بلاغك يصنع فرقاً حقيقياً في حياة آلاف
+              الجيران.</p>
+            <div class="hbt">
+              <button class="bp" onclick="showPage('reports')">📍 أبلغ عن مشكلة الآن</button>
+              <button class="bss"
+                onclick="document.getElementById('how-section').scrollIntoView({behavior:'smooth'})">شاهد كيف يعمل
+                ←</button>
+            </div>
+          </div>
+          <div class="hv">
+            <div class="pc">
+              <div class="ph">
+                <div class="phl"><span></span> عين المواطن</div>
+                <div class="phs">مباشر</div>
+              </div>
+              <div class="pb">
+                <div class="ri">
+                  <div class="ric rg">🛣️</div>
+                  <div class="rif">
+                    <div class="rit">حفرة — شارع الجندويل</div>
+                    <div class="ril">قبل 3 دقائق</div>
+                  </div><span class="rbdg rbg2">مفتوح</span>
+                </div>
+                <div class="ri">
+                  <div class="ric rbb2">💡</div>
+                  <div class="rif">
+                    <div class="rit">عمود إنارة معطل</div>
+                    <div class="ril">منذ ساعة</div>
+                  </div><span class="rbdg rbbb">قيد التنفيذ</span>
+                </div>
+                <div class="ri">
+                  <div class="ric ra">💧</div>
+                  <div class="rif">
+                    <div class="rit">تسرب مياه — حي العيون</div>
+                    <div class="ril">تم الحل</div>
+                  </div><span class="rbdg rba">✅ محلول</span>
+                </div>
+              </div>
+              <div class="pfx"><span>12,450 بلاغ إجمالي</span><strong>↑ 98% معدل الحل</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="how" id="how-section">
+        <div class="stag">كيف يعمل</div>
+        <h2 class="st reveal">ثلاث خطوات <span class="hl">بسيطة</span></h2>
+        <div class="stepper reveal" style="transition-delay:.1s">
+          <div class="step-nav">
+            <div class="snb">
+              <div class="snum active" id="sn1" onclick="goStep(1)">١</div>
+              <div class="sline" id="sl1"></div>
+              <div class="snum" id="sn2" onclick="goStep(2)">٢</div>
+              <div class="sline" id="sl2"></div>
+              <div class="snum" id="sn3" onclick="goStep(3)">٣</div>
+            </div>
+          </div>
+          <div class="step-panels">
+            <div class="step-panel active" id="sp1">
+              <div class="step-header">
+                <div class="step-num-badge">
+                  <div class="sn">١</div> الخطوة الأولى
+                </div><span class="step-icon">📸</span>
+                <h3 class="step-title">التقط وأرسل</h3>
+                <p class="step-desc">صوّر أضرار الطرق والإضاءة المعطلة أو تسربات المياه. نقرة واحدة ترسل بلاغك فورًا
+                  للفريق المختص.</p>
+              </div><img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=700&q=80" loading="lazy"
+                style="border-radius:14px;max-height:230px;width:100%;object-fit:cover;margin-bottom:22px">
+              <div class="step-btns"><button class="sbtn-next" onclick="goStep(2)">الخطوة التالية ←</button><span
+                  class="step-progress">١ من ٣</span></div>
+            </div>
+            <div class="step-panel" id="sp2">
+              <div class="step-header">
+                <div class="step-num-badge">
+                  <div class="sn">٢</div> الخطوة الثانية
+                </div><span class="step-icon">📍</span>
+                <h3 class="step-title">تحديد الموقع التلقائي</h3>
+                <p class="step-desc">يحدد GPS الموقع تلقائيًا. فرق الإصلاح تصل للمكان الدقيق مباشرةً.</p>
+              </div><img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=700&q=80" loading="lazy"
+                style="border-radius:14px;max-height:230px;width:100%;object-fit:cover;margin-bottom:22px">
+              <div class="step-btns"><button class="sbtn-next" onclick="goStep(3)">الخطوة التالية ←</button><button
+                  class="sbtn-back" onclick="goStep(1)">← السابق</button><span class="step-progress">٢ من ٣</span></div>
+            </div>
+            <div class="step-panel" id="sp3">
+              <div class="step-header">
+                <div class="step-num-badge">
+                  <div class="sn">٣</div> الخطوة الثالثة
+                </div><span class="step-icon">🔔</span>
+                <h3 class="step-title">تتبع لحظي</h3>
+                <p class="step-desc">إشعارات فورية مع كل تحديث: من "تم الاستلام" ← "قيد التنفيذ" ← "تم الحل".</p>
+              </div><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=700&q=80" loading="lazy"
+                style="border-radius:14px;max-height:230px;width:100%;object-fit:cover;margin-bottom:22px">
+              <div class="step-btns"><button class="sbtn-done" onclick="showPage('reports')">ابدأ الآن
+                  🚀</button><button class="sbtn-back" onclick="goStep(2)">← السابق</button><span
+                  class="step-progress">٣ من ٣</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="hsb2">
+        <div class="hs">
+          <div class="hsn"><span class="counter" data-t="12450">0</span><span
+              style="font-size:1.1rem;color:var(--a)">+</span></div>
+          <div class="hsl">إجمالي البلاغات</div>
+        </div>
+        <div class="hs">
+          <div class="hsn"><span class="counter" data-t="9800">0</span><span
+              style="font-size:1.1rem;color:var(--a)">+</span></div>
+          <div class="hsl">مشكلة تم حلها</div>
+        </div>
+        <div class="hs">
+          <div class="hsn">48<span style="font-size:1rem;color:var(--a)">س</span></div>
+          <div class="hsl">متوسط الاستجابة</div>
+        </div>
+        <div class="hs">
+          <div class="hsn">15</div>
+          <div class="hsl">حياً نشطاً</div>
+        </div>
+      </div>
+
+      <div class="ps2">
+        <div class="psi"><img src="https://images.unsplash.com/photo-1596079890687-26b6f0e56d59?w=700&q=70"
+            loading="lazy">
+          <div class="psl"><span class="psd" style="background:#4ade80"></span>تم إصلاح الطريق</div>
+        </div>
+        <div class="psi"><img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=700&q=70"
+            loading="lazy">
+          <div class="psl"><span class="psd" style="background:#60a5fa"></span>إنارة قيد التنفيذ</div>
+        </div>
+        <div class="psi"><img src="https://images.unsplash.com/photo-1478588073530-e91e1534c5b5?w=700&q=70"
+            loading="lazy">
+          <div class="psl"><span class="psd" style="background:#fbbf24"></span>حديقة — بلاغ مفتوح</div>
+        </div>
+      </div>
+      <section class="dash">
+        <div class="dg">
+          <div class="sg-chart reveal" id="statsChartWrap">
+            <canvas id="statsChart" width="380" height="230"
+              style="width:100%;max-width:380px;display:block;margin:0 auto"></canvas>
+            <div class="chart-kpis">
+              <div class="kpi-pill">
+                <div class="kpi-val">12,450<span class="kpi-unit">+</span></div>
+                <div class="kpi-lbl">إجمالي البلاغات</div>
+              </div>
+              <div class="kpi-pill">
+                <div class="kpi-val">9,800<span class="kpi-unit">+</span></div>
+                <div class="kpi-lbl">مشكلة تم حلها</div>
+              </div>
+              <div class="kpi-pill">
+                <div class="kpi-val">48<span class="kpi-unit">س</span></div>
+                <div class="kpi-lbl">متوسط الاستجابة</div>
+              </div>
+              <div class="kpi-pill">
+                <div class="kpi-val">15</div>
+                <div class="kpi-lbl">حياً نشطاً</div>
+              </div>
+            </div>
+          </div>
+          <div class="dt reveal" style="transition-delay:.2s">
+            <div class="stag">لوحة الشفافية</div>
+            <h2 class="st" style="margin-bottom:12px">الحكومة <span class="hl">تعمل فعلًا</span></h2>
+            <p>بيانات حية تُظهر التقدم الحقيقي. عندما تُبلّغ — نقيس. وعندما نقيس — تُحل المشكلات.</p>
+            <div class="pi">
+              <div class="pt2"><strong>الطرق والأرصفة</strong><span>87%</span></div>
+              <div class="ptr">
+                <div class="pf2" style="width:87%"></div>
+              </div>
+            </div>
+            <div class="pi">
+              <div class="pt2"><strong>إنارة الشوارع</strong><span>79%</span></div>
+              <div class="ptr">
+                <div class="pf2" style="width:79%;animation-delay:.2s"></div>
+              </div>
+            </div>
+            <div class="pi">
+              <div class="pt2"><strong>المياه والصرف</strong><span>92%</span></div>
+              <div class="ptr">
+                <div class="pf2" style="width:92%;animation-delay:.4s"></div>
+              </div>
+            </div>
+            <div class="pi">
+              <div class="pt2"><strong>الحدائق العامة</strong><span>68%</span></div>
+              <div class="ptr">
+                <div class="pf2" style="width:68%;animation-delay:.6s"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ===== PREDICTIVE REPORT SECTION ===== -->
+      <section class="predict-section">
+        <div class="predict-inner">
+          <div class="predict-header reveal">
+            <div class="stag" style="background:rgba(200,150,26,.13);color:#92600a;border-color:rgba(200,150,26,.3)">
+              <span style="background:#C8961A"></span>تحليل تنبؤي
+            </div>
+            <h2 class="st">توقعات الضغط على <span class="hl">البنية التحتية</span></h2>
+            <p class="predict-sub">بناءً على بيانات البلاغات التاريخية وعوامل موسمية — إليك التوقعات للأشهر القادمة من
+              2026</p>
+          </div>
+
+          <!-- Heat Calendar -->
+          <div class="predict-calendar reveal" style="transition-delay:.1s">
+            <div class="cal-months">
+              <div class="cal-month low">
+                <div class="cal-month-header"><span class="cal-label">يناير</span><span class="risk-badge risk-med">⚠️
+                    متوسط</span></div>
+                <div class="cal-reasons"><span class="reason-tag">🌧️ أمطار شتوية</span><span class="reason-tag">🛣️
+                    تشقق طرق</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:58%;--bcol:#f59e0b"></div><span class="cal-pct">58%</span>
+                </div>
+              </div>
+              <div class="cal-month low">
+                <div class="cal-month-header"><span class="cal-label">فبراير</span><span class="risk-badge risk-med">⚠️
+                    متوسط</span></div>
+                <div class="cal-reasons"><span class="reason-tag">❄️ صقيع وبرد</span><span class="reason-tag">💧
+                    فيضانات</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:62%;--bcol:#f59e0b"></div><span class="cal-pct">62%</span>
+                </div>
+              </div>
+              <div class="cal-month low">
+                <div class="cal-month-header"><span class="cal-label">مارس</span><span class="risk-badge risk-low">✅
+                    منخفض</span></div>
+                <div class="cal-reasons"><span class="reason-tag">🌤️ طقس معتدل</span><span class="reason-tag">🌿 صيانة
+                    دورية</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:32%;--bcol:#1aab6d"></div><span class="cal-pct">32%</span>
+                </div>
+              </div>
+              <div class="cal-month low">
+                <div class="cal-month-header"><span class="cal-label">أبريل</span><span class="risk-badge risk-low">✅
+                    منخفض</span></div>
+                <div class="cal-reasons"><span class="reason-tag">🌸 ربيع هادئ</span><span class="reason-tag">🔧 مشاريع
+                    تطوير</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:28%;--bcol:#1aab6d"></div><span class="cal-pct">28%</span>
+                </div>
+              </div>
+              <div class="cal-month high">
+                <div class="cal-month-header"><span class="cal-label">مايو</span><span class="risk-badge risk-high">🔴
+                    مرتفع</span></div>
+                <div class="cal-reasons"><span class="reason-tag">🌡️ بدء الحر</span><span class="reason-tag">🚗 ضغط
+                    مروري</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:74%;--bcol:#ef4444"></div><span class="cal-pct">74%</span>
+                </div>
+              </div>
+              <div class="cal-month peak">
+                <div class="cal-month-header"><span class="cal-label">يونيو</span><span class="risk-badge risk-peak">🚨
+                    ذروة</span></div>
+                <div class="cal-reasons"><span class="reason-tag">✈️ عودة المغتربين</span><span class="reason-tag">🔥
+                    موجة حر</span><span class="reason-tag">🏖️ موسم صيفي</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:94%;--bcol:#dc2626"></div><span class="cal-pct">94%</span>
+                </div>
+              </div>
+              <div class="cal-month peak">
+                <div class="cal-month-header"><span class="cal-label">يوليو</span><span class="risk-badge risk-peak">🚨
+                    ذروة</span></div>
+                <div class="cal-reasons"><span class="reason-tag">✈️ ذروة المغتربين</span><span class="reason-tag">🎓
+                    إجازة مدرسية</span><span class="reason-tag">🌡️ +40°م</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:100%;--bcol:#b91c1c"></div><span class="cal-pct">100%</span>
+                </div>
+              </div>
+              <div class="cal-month peak">
+                <div class="cal-month-header"><span class="cal-label">أغسطس</span><span class="risk-badge risk-peak">🚨
+                    ذروة</span></div>
+                <div class="cal-reasons"><span class="reason-tag">✈️ مغتربون</span><span class="reason-tag">🏗️ تضرر
+                    أرصفة</span><span class="reason-tag">💧 شح مياه</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:91%;--bcol:#dc2626"></div><span class="cal-pct">91%</span>
+                </div>
+              </div>
+              <div class="cal-month high">
+                <div class="cal-month-header"><span class="cal-label">سبتمبر</span><span class="risk-badge risk-high">🔴
+                    مرتفع</span></div>
+                <div class="cal-reasons"><span class="reason-tag">🎒 عودة المدارس</span><span class="reason-tag">🚦
+                    اختناق مروري</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:77%;--bcol:#ef4444"></div><span class="cal-pct">77%</span>
+                </div>
+              </div>
+              <div class="cal-month low">
+                <div class="cal-month-header"><span class="cal-label">أكتوبر</span><span class="risk-badge risk-med">⚠️
+                    متوسط</span></div>
+                <div class="cal-reasons"><span class="reason-tag">🍂 أمطار مبكرة</span><span class="reason-tag">🛣️
+                    تشققات ما بعد الصيف</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:55%;--bcol:#f59e0b"></div><span class="cal-pct">55%</span>
+                </div>
+              </div>
+              <div class="cal-month low">
+                <div class="cal-month-header"><span class="cal-label">نوفمبر</span><span class="risk-badge risk-med">⚠️
+                    متوسط</span></div>
+                <div class="cal-reasons"><span class="reason-tag">🌧️ موسم مطري</span><span class="reason-tag">🌊
+                    سيول</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:60%;--bcol:#f59e0b"></div><span class="cal-pct">60%</span>
+                </div>
+              </div>
+              <div class="cal-month high">
+                <div class="cal-month-header"><span class="cal-label">ديسمبر</span><span class="risk-badge risk-high">🔴
+                    مرتفع</span></div>
+                <div class="cal-reasons"><span class="reason-tag">❄️ ثلوج وجليد</span><span class="reason-tag">💡 أعطال
+                    إنارة</span><span class="reason-tag">🎄 ضغط خدمات</span></div>
+                <div class="cal-bar-wrap">
+                  <div class="cal-bar" style="--bpct:79%;--bcol:#ef4444"></div><span class="cal-pct">79%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insight Cards -->
+          <div class="predict-insights reveal" style="transition-delay:.2s">
+            <div class="insight-card insight-peak">
+              <div class="insight-icon">✈️</div>
+              <div class="insight-body">
+                <h4>موسم عودة المغتربين</h4>
+                <p>يونيو – أغسطس: ارتفاع البلاغات بنسبة <strong>+180%</strong> عن المعدل. الطرق والإنارة والنظافة الأكثر
+                  تأثراً.</p>
+                <div class="insight-action"><span class="insight-chip">📋 خطة استعداد مقترحة</span></div>
+              </div>
+            </div>
+            <div class="insight-card insight-winter">
+              <div class="insight-icon">❄️</div>
+              <div class="insight-body">
+                <h4>موسم الأمطار والشتاء</h4>
+                <p>ديسمبر – فبراير: تشققات الطرق وأعطال الصرف الصحي ترتفع <strong>+65%</strong> بسبب التجمد وسيول
+                  الشتاء.</p>
+                <div class="insight-action"><span class="insight-chip">🛡️ صيانة وقائية مبكرة</span></div>
+              </div>
+            </div>
+            <div class="insight-card insight-school">
+              <div class="insight-icon">🎒</div>
+              <div class="insight-body">
+                <h4>عودة المدارس — سبتمبر</h4>
+                <p>ارتفاع مفاجئ في بلاغات الأرصفة والإشارات والإنارة بنسبة <strong>+55%</strong> مع تضاعف حركة المرور.
+                </p>
+                <div class="insight-action"><span class="insight-chip">🚦 تحسين بنية المناطق المدرسية</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forecast note -->
+          <div class="predict-note reveal" style="transition-delay:.3s">
+            <span class="note-icon">🤖</span>
+            <p>التوقعات مبنية على تحليل <strong>3 سنوات</strong> من بيانات البلاغات التاريخية مع الأخذ بعين الاعتبار
+              عوامل مناخية وموسمية واجتماعية خاصة بالمملكة الأردنية الهاشمية.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="ib"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1600&q=70"
+          loading="lazy">
+        <div class="ibc">
+          <div class="ibci reveal">
+            <div class="dv"></div>
+            <h2>مدينتك تستحق الأفضل</h2>
+            <p>كل بلاغ تُرسله خطوة نحو بنية تحتية أكثر أمانًا.</p>
+          </div>
+        </div>
+      </div>
+      <section class="why">
+        <div class="stag">لماذا تشارك</div>
+        <h2 class="st reveal">مدينتك. <span class="hl">صوتك.</span></h2>
+        <div class="wg">
+          <div class="wc reveal"><img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&q=70"
+              loading="lazy">
+            <div class="wcb"><span class="wci">🎯</span>
+              <h3 class="wct">تأثير مباشر</h3>
+              <p class="wcd">عيناك في الشارع تساعد على تحديد الإصلاحات العاجلة.</p>
+            </div>
+          </div>
+          <div class="wc reveal" style="transition-delay:.15s"><img
+              src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&q=70" loading="lazy">
+            <div class="wcb"><span class="wci">📋</span>
+              <h3 class="wct">بلا بيروقراطية</h3>
+              <p class="wcd">تجاوز الإجراءات المعقدة وتواصل مباشرةً مع أصحاب القرار.</p>
+            </div>
+          </div>
+          <div class="wc reveal" style="transition-delay:.3s"><img
+              src="https://images.unsplash.com/photo-1494526585095-c41746248156?w=600&q=70" loading="lazy">
+            <div class="wcb"><span class="wci">🏙️</span>
+              <h3 class="wct">فخر المجتمع</h3>
+              <p class="wcd">كن جزءًا من الحركة التي تجعل مدينتك أكثر أمانًا.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="test">
+        <div class="stag">آراء المواطنين</div>
+        <h2 class="st reveal">ما يقوله <span class="hl">جيرانك</span></h2>
+        <div class="tg">
+          <div class="tc reveal">
+            <div class="tcq">"</div>
+            <p class="tct">أرسلت بلاغًا عن حفرة كبيرة، وخلال 36 ساعة كان الفريق موجودًا وتم الإصلاح.</p>
+            <div class="tca">
+              <div>
+                <div class="tcn">حلا الزعي</div>
+                <div class="tcl">حي السلالم</div>
+                <div class="tcs">★★★★★</div>
+              </div>
+              <div class="tcav">حز</div>
+            </div>
+          </div>
+          <div class="tc reveal" style="transition-delay:.15s">
+            <div class="tcq">"</div>
+            <p class="tct">التقطت صورة للعمود الكهربائي المعطل وتلقيت إشعارًا بالحل في نفس اليوم!</p>
+            <div class="tca">
+              <div>
+                <div class="tcn">خالد أحمد</div>
+                <div class="tcl">حي الصافح</div>
+                <div class="tcs">★★★★★</div>
+              </div>
+              <div class="tcav">خا</div>
+            </div>
+          </div>
+          <div class="tc reveal" style="transition-delay:.3s">
+            <div class="tcq">"</div>
+            <p class="tct">أخيرًا منصة تُشعرني أن صوتي مسموع! الشفافية في التتبع رائعة.</p>
+            <div class="tca">
+              <div>
+                <div class="tcn">سارة الحرابشة</div>
+                <div class="tcl">حي السلالم</div>
+                <div class="tcs">★★★★☆</div>
+              </div>
+              <div class="tcav">سح</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="cta">
+        <div class="stag" style="justify-content:center">ابدأ الآن</div>
+        <h2 class="ctat reveal">انضم لأكثر من<br><span class="hl">12,450 مواطنًا</span></h2>
+        <p class="ctas reveal">بلاغك قد يكون الحل لحفرة يقتحمها جارك كل صباح.</p>
+        <div class="ctab reveal">
+          <button class="bp" onclick="showPage('reports')">📍 أبلغ عن مشكلة الآن</button>
+          <button class="bss" onclick="showPage('contrib')">🤝 شاهد المساهمين</button>
+        </div>
+        <div class="apb reveal">
+          <a href="#" class="ab">
+            <div class="abi">🍎</div>
+            <div class="abt"><span class="abs">حمّل من</span><span class="abn">App Store</span></div>
+          </a>
+          <a href="#" class="ab">
+            <div class="abi">▶</div>
+            <div class="abt"><span class="abs">احصل من</span><span class="abn">Google Play</span></div>
+          </a>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ===== PAGE: REPORTS ===== -->
+    <div id="page-reports" class="page">
+      <div class="report-wrap">
+        <div class="welcome-banner">
+          <div class="welcome-content">
+            <h1>مرحباً في عين المواطن</h1>
+            <p>ساهم في تحسين مدينتك من خلال الإبلاغ عن مشاكل البنية التحتية</p>
+          </div>
+          <div class="welcome-icon"><i class="fa-solid fa-comments"></i></div>
+        </div>
+        <div class="white-box">
+          <p class="sec-title" style="text-align:center">ابدأ الآن بتصوير المشكلة</p>
+          <div class="main-action">
+            <label for="file-input" class="circle-btn"><i class="fa-solid fa-camera"></i><span>أبلغ الآن</span></label>
+            <input type="file" id="file-input" accept="image/*,video/*" capture="environment" style="display:none"
+              onchange="showToast('تم تحميل الصورة بنجاح!')">
+          </div>
+        </div>
+        <div class="white-box">
+          <button class="location-btn" onclick="findLocation()"><i class="fa-solid fa-location-dot"></i> تحديد
+            الموقع</button>
+          <div id="map"></div>
+        </div>
+        <div class="white-box">
+          <div class="desc-container">
+            <label for="issue-desc">وصف المشكلة:</label>
+            <textarea id="issue-desc" placeholder="اكتب تفاصيل المشكلة هنا..."></textarea>
+          </div>
+        </div>
+        <div class="white-box">
+          <p class="sec-title">قائمة التصنيفات:</p>
+          <div class="cats-grid">
+            <div class="cat-item"><input type="radio" name="cat" id="c1" hidden><label for="c1"><i
+                  class="fa-solid fa-road-barrier"></i><span>حفرة</span></label></div>
+            <div class="cat-item"><input type="radio" name="cat" id="c2" hidden><label for="c2"><i
+                  class="fa-solid fa-trash-can"></i><span>نفايات</span></label></div>
+            <div class="cat-item"><input type="radio" name="cat" id="c3" hidden><label for="c3"><i
+                  class="fa-solid fa-lightbulb"></i><span>إنارة</span></label></div>
+            <div class="cat-item"><input type="radio" name="cat" id="c4" hidden><label for="c4"><i
+                  class="fa-solid fa-faucet-drip"></i><span>مياه</span></label></div>
+          </div>
+        </div>
+        <div class="white-box">
+          <p class="sec-title">مستوى الخطورة:</p>
+          <div class="priority-options">
+            <label class="priority-item"><input type="radio" name="prio" value="urgent"><span
+                class="dot red"></span><span>عاجل</span></label>
+            <label class="priority-item"><input type="radio" name="prio" value="medium"><span
+                class="dot yellow"></span><span>متوسط</span></label>
+            <label class="priority-item"><input type="radio" name="prio" value="low"><span
+                class="dot blue"></span><span>منخفض</span></label>
+          </div>
+        </div>
+        <div class="white-box">
+          <div class="user-info-section">
+            <p class="sec-title">المعلومات الشخصية:</p>
+            <div class="inp-group"><i class="fa-solid fa-user"></i><input type="text" id="rFullName"
+                placeholder="الاسم الكامل"></div>
+            <div class="inp-group"><i class="fa-solid fa-phone"></i><input type="tel" id="rPhone"
+                placeholder="رقم الهاتف"></div>
+            <div class="inp-group"><i class="fa-solid fa-envelope"></i><input type="email" id="rEmail"
+                placeholder="البريد الإلكتروني"></div>
+          </div>
+        </div>
+        <div class="white-box">
+          <button class="submit-btn" onclick="submitReport()">تأكيد وإرسال البلاغ</button>
+          <div class="points-badge"><i class="fa-solid fa-star"></i><span>مجموع النقاط: <strong
+                id="user-points">0</strong></span></div>
+        </div>
+        <div class="tracking-container">
+          <p class="sec-title">تتبع حالة البلاغ</p>
+          <div class="tracking-stepper">
+            <div class="step-tr sent">
+              <div class="step-dot-tr"><i class="fa-solid fa-paper-plane"></i></div><span>تم الإرسال</span>
+            </div>
+            <div style="flex:1;height:2px;background:var(--bd)"></div>
+            <div class="step-tr processing">
+              <div class="step-dot-tr"><i class="fa-regular fa-clock"></i></div><span>قيد المعالجة</span>
+            </div>
+            <div style="flex:1;height:2px;background:var(--bd)"></div>
+            <div class="step-tr solved">
+              <div class="step-dot-tr"><i class="fa-solid fa-check-double"></i></div><span>تم الحل</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="report-footer">
+        <p>© 2026 Citizen Eye / عين المواطن — منصة مجتمعية للإبلاغ عن مشاكل البنية التحتية</p>
+      </div>
+    </div>
+
+    <!-- ===== PAGE: CONTRIBUTORS ===== -->
+    <div id="page-contrib" class="page">
+      <div class="contrib-page">
+        <section class="contrib-hero">
+          <div class="container" style="max-width:1100px;margin:0 auto;padding:0 24px">
+            <div class="hero-badge">🤝 مجتمع المساهمين الفعّالين</div>
+            <h1>اللجان المجتمعية<br><span class="highlight">شركاء التغيير</span></h1>
+            <p>تعرّف على المواطنين الذين يصنعون فرقًا حقيقيًا في مجتمعاتهم من خلال مساهماتهم المستمرة.</p>
+            <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:36px">
+              <button class="cbtn cbtn-primary"
+                onclick="document.getElementById('join-section').scrollIntoView({behavior:'smooth'})"><i
+                  class="fa-solid fa-user-plus"></i> انضم إلى لجنة</button>
+              <button class="cbtn cbtn-outline" style="color:#a8d8ff;border-color:rgba(255,255,255,.3)"
+                onclick="showPage('reports')">📋 قدّم بلاغاً</button>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-item">
+                <div class="stat-num">462</div>
+                <div class="stat-label">عضو نشط</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num">8</div>
+                <div class="stat-label">لجان مجتمعية</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num">2,840</div>
+                <div class="stat-label">بلاغ مشترك</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num">94%</div>
+                <div class="stat-label">معدل الحل</div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="c-section">
+          <div class="container" style="max-width:1100px;margin:0 auto;padding:0 24px">
+            <div style="text-align:center;margin-bottom:10px"><span class="ctag">أبرز المساهمين</span></div>
+            <h2 class="c-section-title">قادة التغيير في مجتمعنا</h2>
+            <p class="c-section-sub">هؤلاء المواطنون المتميزون يقودون جهود تحسين البنية التحتية بتفانٍ واحتراف.</p>
+            <div class="cards-grid-3">
+              <div class="contributor-card fade-in">
+                <div class="card-ribbon gold">🥇 الأول</div>
+                <div class="card-img-wrap"><img src=" " loading="lazy">
+                  <div class="card-avatar"
+                    style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">🏆</div>
+                </div>
+                <div class="card-body">
+                  <h3>أحمد عبدالله الزيود</h3>
+                  <p>قدّم 145 بلاغًا موثقًا، وأسهم في تحسين 12 حيًّا سكنيًّا خلال 2025.</p><button
+                    class="cbtn cbtn-primary" onclick="openModal('contrib_user')">عرض الملف ←</button>
+                </div>
+              </div>
+              <div class="contributor-card fade-in">
+                <div class="card-ribbon green">🥈 الثاني</div>
+                <div class="card-img-wrap"><img src=" " loading="lazy">
+                  <div class="card-avatar"
+                    style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">🌟</div>
+                </div>
+                <div class="card-body">
+                  <h3>منى سليمان العمرو</h3>
+                  <p>رائدة في بلاغات الإنارة والطرق، حازت لقب "المواطنة الفعّالة" لثلاثة أشهر متتالية.</p><button
+                    class="cbtn cbtn-green" onclick="openModal('contrib_user')">عرض الملف ←</button>
+                </div>
+              </div>
+              <div class="contributor-card fade-in">
+                <div class="card-ribbon">🥉 الثالث</div>
+                <div class="card-img-wrap"><img src=" " loading="lazy">
+                  <div class="card-avatar"
+                    style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">💪</div>
+                </div>
+                <div class="card-body">
+                  <h3>خالد مصطفى البطاينة</h3>
+                  <p>متطوع ميداني يوثّق المشاكل ويتابع حلّها حتى الإغلاق الرسمي.</p><button class="cbtn cbtn-outline"
+                    onclick="openModal('contrib_user')">عرض الملف ←</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="c-section c-section-alt">
+          <div class="container" style="max-width:1100px;margin:0 auto;padding:0 24px">
+            <div style="text-align:center;margin-bottom:10px"><span class="ctag">نظام الأوسمة</span></div>
+            <h2 class="c-section-title">اكسب وسامك الرقمي</h2>
+            <p class="c-section-sub">كل مستوى من المشاركة يمنحك وسامًا يُعزّز صلاحياتك على المنصة.</p>
+            <div class="badges-grid">
+              <div class="badge-card fade-in"><span class="badge-icon">🌱</span>
+                <h4>مواطن مبادر</h4>
+                <p>أول 5 بلاغات موثّقة ومقبولة</p><span class="badge-pill">مفتوح للجميع</span>
+              </div>
+              <div class="badge-card fade-in"><span class="badge-icon">⭐</span>
+                <h4>مراقب نشط</h4>
+                <p>20 بلاغًا بدقة تفوق 90%</p><span class="badge-pill">متاح الآن</span>
+              </div>
+              <div class="badge-card fade-in"><span class="badge-icon">🔥</span>
+                <h4>قائد المجتمع</h4>
+                <p>50 بلاغًا + تدريب المتطوعين</p><span class="badge-pill">مستوى متقدم</span>
+              </div>
+              <div class="badge-card fade-in"><span class="badge-icon">👑</span>
+                <h4>سفير المدينة</h4>
+                <p>100 بلاغ + مساهمة في السياسات</p><span class="badge-pill">النخبة</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="c-section">
+          <div class="container" style="max-width:1100px;margin:0 auto;padding:0 24px">
+            <div style="text-align:center;margin-bottom:10px"><span class="ctag">الإنجازات الميدانية</span></div>
+            <h2 class="c-section-title">مشاريع أنجزناها معاً</h2>
+            <p class="c-section-sub">نماذج حقيقية لتحسينات تمّت بفضل تعاون المجتمع.</p>
+            <div class="img-cards-grid">
+              <div class="img-card fade-in">
+                <div class="img-card-tag">✅ منجز</div><img
+                  src="https://images.unsplash.com/photo-1596079890687-26b6f0e56d59?w=600&q=70" loading="lazy">
+                <div class="img-card-label">
+                  <h4>إصلاح طريق حي الجندويل</h4>
+                  <p>47 بلاغًا · أُنجز في 72 ساعة</p>
+                </div>
+              </div>
+              <div class="img-card fade-in"><img
+                  src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=70" loading="lazy">
+                <div class="img-card-tag" style="background:var(--blue,#1a5fa8)">⏳ جارٍ</div>
+                <div class="img-card-label">
+                  <h4>تجديد شبكة إنارة حي العيون</h4>
+                  <p>31 بلاغًا · تقدّم 65%</p>
+                </div>
+              </div>
+              <div class="img-card fade-in"><img
+                  src="https://images.unsplash.com/photo-1478588073530-e91e1534c5b5?w=600&q=70" loading="lazy">
+                <div class="img-card-tag" style="background:#e9a800">📋 مقترح</div>
+                <div class="img-card-label">
+                  <h4>تطوير حديقة وسط البلد</h4>
+                  <p>18 بلاغًا · قيد الموافقة</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="c-section c-section-alt">
+          <div class="container" style="max-width:1100px;margin:0 auto;padding:0 24px">
+            <div style="text-align:center;margin-bottom:10px"><span class="ctag">قصص النجاح</span></div>
+            <h2 class="c-section-title">مواطنون يصنعون الفرق</h2>
+            <p class="c-section-sub">تجارب حقيقية من مجتمعنا.</p>
+            <div class="testimonials-grid">
+              <div class="testimonial-card fade-in"><span class="quote-icon">"</span>
+                <p>انضممت للجنة الحي قبل عام. اليوم، حفرة الطريق التي كانت تُعيق حركتنا أصبحت ذكرى.</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">👩</div>
+                  <div class="author-info"><strong>هالة المجالي</strong><span>لجنة حي الجندويل</span></div>
+                  <div class="stars">★★★★★</div>
+                </div>
+              </div>
+              <div class="testimonial-card fade-in"><span class="quote-icon">"</span>
+                <p>المنصة أعطتنا صوتًا. نُحوّل الشكاوى إلى قرارات بسرعة لم نكن نتخيلها.</p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">👨</div>
+                  <div class="author-info"><strong>سعد الطراونة</strong><span>رئيس لجنة حي العيون</span></div>
+                  <div class="stars">★★★★★</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- COMMITTEES SECTION -->
+        <section class="c-section" id="committees-section">
+          <div class="container" style="max-width:1100px;margin:0 auto;padding:0 24px">
+            <div style="text-align:center;margin-bottom:10px"><span class="ctag">اللجان المجتمعية</span></div>
+            <h2 class="c-section-title">لجان الأحياء الفاعلة</h2>
+            <p class="c-section-sub">كل حي في المملكة الأردنية الهاشمية يملك لجنته الخاصة من المتطوعين المنتخبين الذين
+              يتابعون البلاغات ويضمنون الاستجابة.</p>
+            <div
+              style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-bottom:48px">
+              <div class="co-card fade-in" style="flex-direction:column;align-items:flex-start;padding:20px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;width:100%">
+                  <span class="co-icon">🏘️</span>
+                  <div><strong style="font-size:.95rem;color:#0a2342">لجنة حي الجندويل</strong><br><span
+                      style="font-size:.75rem;color:#6b7a90">رئيس اللجنة: نضال الرواشدة</span></div>
+                  <span class="co-status open" style="margin-right:auto">مفتوح</span>
+                </div>
+                <div
+                  style="font-size:.78rem;color:#6b7a90;line-height:1.8;border-top:1px solid #e8eef7;padding-top:10px;width:100%">
+                  👥 12 عضو نشط &nbsp;|&nbsp; 📋 87 بلاغ &nbsp;|&nbsp; ✅ 91% حلول<br>
+                  <span style="color:#1a5fa8;font-weight:700">الأعضاء: رضا المجالي، سارة العمرو، محمد الطراونة، نور
+                    الشوبكي</span>
+                </div>
+              </div>
+              <div class="co-card fade-in" style="flex-direction:column;align-items:flex-start;padding:20px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;width:100%">
+                  <span class="co-icon">🌿</span>
+                  <div><strong style="font-size:.95rem;color:#0a2342">لجنة حي العيون</strong><br><span
+                      style="font-size:.75rem;color:#6b7a90">رئيس اللجنة: سعد الطراونة</span></div>
+                  <span class="co-status open" style="margin-right:auto">مفتوح</span>
+                </div>
+                <div
+                  style="font-size:.78rem;color:#6b7a90;line-height:1.8;border-top:1px solid #e8eef7;padding-top:10px;width:100%">
+                  👥 9 أعضاء &nbsp;|&nbsp; 📋 63 بلاغ &nbsp;|&nbsp; ✅ 94% حلول<br>
+                  <span style="color:#1a5fa8;font-weight:700">الأعضاء: خالد البطاينة، هالة المجالي، أحمد الزيود، ليلى
+                    الحراحشة</span>
+                </div>
+              </div>
+              <div class="co-card fade-in" style="flex-direction:column;align-items:flex-start;padding:20px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;width:100%">
+                  <span class="co-icon">🏙️</span>
+                  <div><strong style="font-size:.95rem;color:#0a2342">لجنة حي السلالم</strong><br><span
+                      style="font-size:.75rem;color:#6b7a90">رئيس اللجنة: إيمان الشوبكي</span></div>
+                  <span class="co-status open" style="margin-right:auto">مفتوح</span>
+                </div>
+                <div
+                  style="font-size:.78rem;color:#6b7a90;line-height:1.8;border-top:1px solid #e8eef7;padding-top:10px;width:100%">
+                  👥 15 عضو &nbsp;|&nbsp; 📋 112 بلاغ &nbsp;|&nbsp; ✅ 88% حلول<br>
+                  <span style="color:#1a5fa8;font-weight:700">الأعضاء: منى سليمان، يوسف الرواشدة، دانا المومني، عمر
+                    حجازي</span>
+                </div>
+              </div>
+              <div class="co-card fade-in" style="flex-direction:column;align-items:flex-start;padding:20px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;width:100%">
+                  <span class="co-icon">🌇</span>
+                  <div><strong style="font-size:.95rem;color:#0a2342">لجنة حي الصافح</strong><br><span
+                      style="font-size:.75rem;color:#6b7a90">رئيس اللجنة: باسم الحمود</span></div>
+                  <span class="co-status full" style="margin-right:auto">ممتلئ</span>
+                </div>
+                <div
+                  style="font-size:.78rem;color:#6b7a90;line-height:1.8;border-top:1px solid #e8eef7;padding-top:10px;width:100%">
+                  👥 18 عضو &nbsp;|&nbsp; 📋 95 بلاغ &nbsp;|&nbsp; ✅ 96% حلول<br>
+                  <span style="color:#1a5fa8;font-weight:700">الأعضاء: سلمى الحرابشة، فارس المجالي، رانيا الزعبي، طارق
+                    البدور</span>
+                </div>
+              </div>
+              <div class="co-card fade-in" style="flex-direction:column;align-items:flex-start;padding:20px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;width:100%">
+                  <span class="co-icon">🏫</span>
+                  <div><strong style="font-size:.95rem;color:#0a2342">لجنة حي القلعة</strong><br><span
+                      style="font-size:.75rem;color:#6b7a90">رئيس اللجنة: ربى الطحاينة</span></div>
+                  <span class="co-status open" style="margin-right:auto">مفتوح</span>
+                </div>
+                <div
+                  style="font-size:.78rem;color:#6b7a90;line-height:1.8;border-top:1px solid #e8eef7;padding-top:10px;width:100%">
+                  👥 7 أعضاء &nbsp;|&nbsp; 📋 44 بلاغ &nbsp;|&nbsp; ✅ 86% حلول<br>
+                  <span style="color:#1a5fa8;font-weight:700">الأعضاء: زياد الرواشدة، حنين المومني، سامي البطاينة</span>
+                </div>
+              </div>
+              <div class="co-card fade-in" style="flex-direction:column;align-items:flex-start;padding:20px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;width:100%">
+                  <span class="co-icon">🌳</span>
+                  <div><strong style="font-size:.95rem;color:#0a2342">لجنة حي الغور</strong><br><span
+                      style="font-size:.75rem;color:#6b7a90">رئيس اللجنة: وليد الطراونة</span></div>
+                  <span class="co-status open" style="margin-right:auto">مفتوح</span>
+                </div>
+                <div
+                  style="font-size:.78rem;color:#6b7a90;line-height:1.8;border-top:1px solid #e8eef7;padding-top:10px;width:100%">
+                  👥 11 عضو &nbsp;|&nbsp; 📋 58 بلاغ &nbsp;|&nbsp; ✅ 90% حلول<br>
+                  <span style="color:#1a5fa8;font-weight:700">الأعضاء: نادين العمرو، حسام الشوبكي، لينا الحمود، ياسر
+                    البدور</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- DONUT CHART SECTION -->
+            <div style="text-align:center;margin-bottom:10px"><span class="ctag">إحصائيات المحافظات</span></div>
+            <h2 class="c-section-title">المحافظات الأكثر تبليغاً</h2>
+            <p class="c-section-sub">توزيع البلاغات المقدّمة حسب المحافظة خلال عام 2025–2026</p>
+            <div
+              style="background:#fff;border-radius:20px;box-shadow:0 4px 20px rgba(10,35,66,.08);padding:36px;border:1px solid #e8eef7;max-width:780px;margin:0 auto 16px">
+              <div class="donut-wrap" style="justify-content:center">
+                <div style="position:relative;width:220px;height:220px;flex-shrink:0">
+                  <canvas id="govChart" width="220" height="220"></canvas>
+                  <div
+                    style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+                    <span style="font-size:1.6rem;font-weight:900;color:#0a2342" id="chartCenter">12,450</span>
+                    <span style="font-size:.72rem;color:#6b7a90;font-weight:600">إجمالي البلاغات</span>
+                  </div>
+                </div>
+                <div class="donut-legend" style="min-width:200px">
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#1a5fa8"></div><span><strong>السلط</strong> — 4,120 بلاغ
+                      (33%)</span>
+                  </div>
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#1aab6d"></div><span><strong>الزرقاء</strong> — 2,985 بلاغ
+                      (24%)</span>
+                  </div>
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#f59e0b"></div><span><strong>إربد</strong> — 2,240 بلاغ
+                      (18%)</span>
+                  </div>
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#ef4444"></div><span><strong>عمّان</strong> — 1,742 بلاغ
+                      (14%)</span>
+                  </div>
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#8b5cf6"></div><span><strong>العقبة</strong> — 870 بلاغ
+                      (7%)</span>
+                  </div>
+                  <div class="donut-legend-item">
+                    <div class="donut-dot" style="background:#64748b"></div><span><strong>أخرى</strong> — 493 بلاغ
+                      (4%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- JOIN FORM INLINE SECTION -->
+        <section class="c-section c-section-alt" id="join-section">
+          <div class="container" style="max-width:780px;margin:0 auto;padding:0 24px">
+            <div style="text-align:center;margin-bottom:10px"><span class="ctag">الانضمام</span></div>
+            <h2 class="c-section-title">طلب الانتساب إلى لجنة الحي</h2>
+            <p class="c-section-sub">سيتم التواصل معك خلال 48 ساعة من فريق التطوع لاستكمال الإجراءات.</p>
+            <div class="join-form-wrap">
+              <!-- Steps -->
+              <div class="jsteps">
+                <div class="jstep active" id="js1">
+                  <div class="jstep-num">١</div>
+                  <div class="jstep-label">البيانات الشخصية</div>
+                </div>
+                <div class="jstep-line" id="jl1"></div>
+                <div class="jstep" id="js2">
+                  <div class="jstep-num">٢</div>
+                  <div class="jstep-label">اختيار اللجنة</div>
+                </div>
+                <div class="jstep-line" id="jl2"></div>
+                <div class="jstep" id="js3">
+                  <div class="jstep-num">٣</div>
+                  <div class="jstep-label">التأكيد</div>
+                </div>
+              </div>
+
+              <!-- Step 1 Panel -->
+              <div id="jp1">
+                <div class="jrow">
+                  <div class="jfg"><label class="jfl">الاسم الأول <span>*</span></label><input class="jfi"
+                      id="jFirstName" placeholder="مثال: أحمد"></div>
+                  <div class="jfg"><label class="jfl">اسم العائلة <span>*</span></label><input class="jfi"
+                      id="jLastName" placeholder="مثال: الزيود"></div>
+                </div>
+                <div class="jrow">
+                  <div class="jfg"><label class="jfl">رقم الهاتف <span>*</span></label><input class="jfi" id="jPhone"
+                      type="tel" placeholder="07X XXXX XXXX"></div>
+                  <div class="jfg"><label class="jfl">البريد الإلكتروني</label><input class="jfi" id="jEmail"
+                      type="email" placeholder="example@mail.com"></div>
+                </div>
+                <div class="jfg"><label class="jfl">الرقم الوطني <span>*</span></label><input class="jfi" id="jNID"
+                    placeholder="أدخل رقمك الوطني"></div>
+                <div class="form-btns"><button class="cbtn cbtn-primary" onclick="joinStep(2)">التالي ←</button></div>
+              </div>
+
+              <!-- Step 2 Panel -->
+              <div id="jp2" style="display:none">
+                <div class="jfg"><label class="jfl">اختر الحي <span>*</span></label>
+                  <select class="jfi" id="jDistrict">
+                    <option value="">— اختر حيّك —</option>
+                    <option value="الجندويل">حي الجندويل — لجنة نضال الرواشدة</option>
+                    <option value="العيون">حي العيون — لجنة سعد الطراونة</option>
+                    <option value="السلالم">حي السلالم — لجنة إيمان الشوبكي</option>
+                    <option value="الصافح">حي الصافح — لجنة باسم الحمود (ممتلئ)</option>
+                    <option value="القلعة">حي القلعة — لجنة ربى الطحاينة</option>
+                    <option value="الغور">حي الغور — لجنة وليد الطراونة</option>
+                  </select>
+                </div>
+                <div class="jfg"><label class="jfl">مجال التطوع</label>
+                  <div class="jcheckboxes">
+                    <div class="jcheck-item"><input type="checkbox" id="jc1" value="طرق وأرصفة"><label for="jc1">🛣️ طرق
+                        وأرصفة</label></div>
+                    <div class="jcheck-item"><input type="checkbox" id="jc2" value="إنارة"><label for="jc2">💡 إنارة
+                        الشوارع</label></div>
+                    <div class="jcheck-item"><input type="checkbox" id="jc3" value="مياه وصرف"><label for="jc3">💧 مياه
+                        وصرف</label></div>
+                    <div class="jcheck-item"><input type="checkbox" id="jc4" value="حدائق"><label for="jc4">🌳 حدائق
+                        عامة</label></div>
+                    <div class="jcheck-item"><input type="checkbox" id="jc5" value="نظافة"><label for="jc5">🗑️ نظافة
+                        بيئية</label></div>
+                    <div class="jcheck-item"><input type="checkbox" id="jc6" value="توثيق"><label for="jc6">📸 توثيق
+                        ميداني</label></div>
+                  </div>
+                </div>
+                <div class="jfg"><label class="jfl">نبذة مختصرة عنك</label><textarea class="jfi" id="jBio" rows="3"
+                    placeholder="أخبرنا لماذا تريد الانضمام..."></textarea></div>
+                <div class="form-btns">
+                  <button class="cbtn cbtn-outline" onclick="joinStep(1)">← السابق</button>
+                  <button class="cbtn cbtn-primary" onclick="joinStep(3)">التالي ←</button>
+                </div>
+              </div>
+
+              <!-- Step 3 Panel -->
+              <div id="jp3" style="display:none">
+                <div id="jConfirmBox">
+                  <div class="jconfirm-row"><span>الاسم</span><span id="jc-name">—</span></div>
+                  <div class="jconfirm-row"><span>الهاتف</span><span id="jc-phone">—</span></div>
+                  <div class="jconfirm-row"><span>الحي</span><span id="jc-district">—</span></div>
+                  <div class="jconfirm-row"><span>مجالات التطوع</span><span id="jc-areas">—</span></div>
+                </div>
+                <br>
+                <label class="agree-row"><input type="checkbox" id="jAgree"> أوافق على شروط التطوع وسياسة
+                  الخصوصية</label>
+                <div class="form-btns">
+                  <button class="cbtn cbtn-outline" onclick="joinStep(2)">← السابق</button>
+                  <button class="cbtn cbtn-primary" id="jSubmitBtn" onclick="submitJoinForm()">✅ إرسال الطلب</button>
+                </div>
+              </div>
+
+              <!-- Success -->
+              <div id="jp4" style="display:none">
+                <div class="success-box">
+                  <div class="si">🎉</div>
+                  <h4>تم إرسال طلبك بنجاح!</h4>
+                  <p>شكراً لك على الانضمام. سيتواصل معك المسؤول خلال 48 ساعة عمل لاستكمال الإجراءات.</p>
+                  <div class="ref-chip" id="jRefNum">REF-2026-XXXX</div>
+                  <button class="cbtn cbtn-green" onclick="joinStep(1);resetJoinForm()">تقديم طلب جديد</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="cta-section">
+          <div class="container" style="max-width:700px;margin:0 auto;padding:0 24px;position:relative">
+            <h2>انضم إلى مجتمع التغيير</h2>
+            <p>كن جزءًا من شبكة المواطنين الذين يعملون معًا لجعل المملكة الأردنية الهاشمية أجمل وأكثر أمانًا.</p>
+            <button class="btn-white"
+              onclick="document.getElementById('join-section').scrollIntoView({behavior:'smooth'})">🤝 انضم إلى لجنة
+              الحي</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ===== PAGE: POINTS/REWARDS ===== -->
+    <div id="page-points" class="page">
+      <div class="points-wrap">
+        <div class="points-hero scroll-reveal">
+          <h1>سجل المساهمات والمكافآت</h1>
+          <p>مساهمتك اليوم تبني مستقبل الغد. تتبع أثرك بكل فخر.</p>
+        </div>
+        <section class="leaderboard-section scroll-reveal">
+          <h2><i class="fas fa-medal"></i> لوحة الشرف والنقاط</h2>
+          <h3>قائمة المتصدرين</h3>
+          <div class="leaderboard-container">
+            <div class="rank-card" onclick="openModal('user_sarah')">
+              <div class="rank-badge">2</div>
+              <img src="https://i.pravatar.cc/100?img=5" alt="سارة">
+              <h3>سارة محمد</h3>
+              <p>2100 نقطة</p>
+            </div>
+            <div class="rank-card first" onclick="openModal('user_ahmed')">
+              <span class="crown">👑</span>
+              <div class="rank-badge">1</div>
+              <img src="https://i.pravatar.cc/100?img=3" alt="أحمد">
+              <h3>أحمد عبدالله</h3>
+              <p>2500 نقطة</p>
+            </div>
+            <div class="rank-card" onclick="openModal('user_omar')">
+              <div class="rank-badge">3</div>
+              <img src="https://i.pravatar.cc/100?img=8" alt="عمر">
+              <h3>عمر خالد</h3>
+              <p>1950 نقطة</p>
+            </div>
+          </div>
+        </section>
+        <section class="vip-panel scroll-reveal">
+          <div class="vip-card" onclick="openModal('vip')">
+            <i class="fas fa-id-card-alt" style="font-size:3.2rem;color:#f0c040;margin-bottom:16px"></i>
+            <h3>بطاقة المواطن الفعال</h3>
+            <p style="font-size:.88rem;opacity:.7;margin-top:8px">هوية رقمية تمنحك حق الأولوية في كافة الدوائر الحكومية.
+            </p>
+            <div style="margin-top:16px;border-top:1px dashed rgba(255,214,0,.28);padding-top:13px">
+              <span style="color:#f0c040;font-weight:700">المسار السريع: نشط ✓</span>
+            </div>
+          </div>
+          <div class="vip-info">
+            <h2>ميزة "المسار الذهبي" الحكومي</h2>
+            <p style="margin-bottom:22px;font-size:1rem;opacity:.9">لأن مساهماتك المتميزة تجعلك شريكاً في بناء الوطن،
+              تمنحك النقاط العالية أولوية استثنائية:</p>
+            <div class="vip-feature"><i class="fas fa-bolt"></i><span><strong>إنجاز فوري:</strong> إنهاء معاملاتك
+                الحكومية في نصف الوقت المعتاد.</span></div>
+            <div class="vip-feature"><i class="fas fa-user-shield"></i><span><strong>خدمة كبار الشخصيات:</strong>
+                استقبال خاص ومعاملة VIP.</span></div>
+            <div class="vip-feature"><i class="fas fa-check-double"></i><span><strong>أولوية البت:</strong> بلاغاتك
+                تُعطى الأولوية القصوى.</span></div>
+          </div>
+        </section>
+        <!-- ===== ACHIEVEMENTS SECTION ===== -->
+        <section id="achievements-section" style="padding:50px 4% 10px">
+          <div
+            style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px">
+            <div>
+              <div class="stag" style="margin-bottom:10px">🏅 سجل البلاغات</div>
+              <h2 class="st" style="margin-bottom:6px">إنجازاتي <span class="hl">التفصيلية</span></h2>
+              <p style="font-size:.88rem;color:var(--tl)">كل بلاغ قدّمته، متى وأين وكم نقطة حصلت</p>
+            </div>
+            <!-- Summary pills -->
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <div id="ach-total-pill"
+                style="background:var(--px);border:1px solid rgba(26,58,107,.15);border-radius:50px;padding:8px 18px;text-align:center">
+                <div style="font-size:1.3rem;font-weight:900;color:var(--p)" id="ach-total-num">0</div>
+                <div style="font-size:.7rem;color:var(--tl);font-weight:700">إجمالي البلاغات</div>
+              </div>
+              <div
+                style="background:#e6f4ee;border:1px solid rgba(0,107,63,.15);border-radius:50px;padding:8px 18px;text-align:center">
+                <div style="font-size:1.3rem;font-weight:900;color:var(--a)" id="ach-pts-num">0</div>
+                <div style="font-size:.7rem;color:var(--tl);font-weight:700">نقاط مكتسبة</div>
+              </div>
+              <div
+                style="background:var(--gl);border:1px solid rgba(200,150,26,.2);border-radius:50px;padding:8px 18px;text-align:center">
+                <div style="font-size:1.3rem;font-weight:900;color:#92600a" id="ach-solved-num">0</div>
+                <div style="font-size:.7rem;color:var(--tl);font-weight:700">تم حلها</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter Bar -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+            <button class="ach-filter active" data-filter="all" onclick="filterAch(this,'all')"
+              style="padding:6px 16px;border-radius:20px;border:1.5px solid var(--p);background:var(--p);color:#fff;font-family:Cairo,sans-serif;font-size:.8rem;font-weight:700;cursor:pointer">الكل</button>
+            <button class="ach-filter" data-filter="solved" onclick="filterAch(this,'solved')"
+              style="padding:6px 16px;border-radius:20px;border:1.5px solid var(--bd);background:transparent;color:var(--tm);font-family:Cairo,sans-serif;font-size:.8rem;font-weight:700;cursor:pointer">✅
+              محلولة</button>
+            <button class="ach-filter" data-filter="processing" onclick="filterAch(this,'processing')"
+              style="padding:6px 16px;border-radius:20px;border:1.5px solid var(--bd);background:transparent;color:var(--tm);font-family:Cairo,sans-serif;font-size:.8rem;font-weight:700;cursor:pointer">⏳
+              قيد التنفيذ</button>
+            <button class="ach-filter" data-filter="open" onclick="filterAch(this,'open')"
+              style="padding:6px 16px;border-radius:20px;border:1.5px solid var(--bd);background:transparent;color:var(--tm);font-family:Cairo,sans-serif;font-size:.8rem;font-weight:700;cursor:pointer">📋
+              مفتوح</button>
+          </div>
+
+          <!-- Reports List -->
+          <div id="ach-list" style="display:flex;flex-direction:column;gap:14px">
+            <!-- Populated by JS -->
+            <div id="ach-empty" style="text-align:center;padding:50px 20px;color:var(--tl)">
+              <div style="font-size:3rem;margin-bottom:12px">📭</div>
+              <p style="font-weight:700;font-size:.95rem">لا توجد بلاغات بعد</p>
+              <p style="font-size:.82rem;margin-top:4px">ابدأ بتقديم بلاغك الأول من صفحة البلاغات</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== DETAIL DRAWER ===== -->
+        <div id="ach-drawer-bg" onclick="closeAchDrawer(event)"
+          style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:8000;align-items:flex-end;justify-content:center">
+          <div id="ach-drawer"
+            style="background:var(--bw);width:100%;max-width:620px;border-radius:26px 26px 0 0;max-height:88vh;overflow-y:auto;padding:0 0 30px;animation:fadeUp .3s ease;position:relative">
+            <!-- Drawer Handle -->
+            <div style="text-align:center;padding:14px 0 0">
+              <div style="width:44px;height:4px;background:var(--bd);border-radius:4px;display:inline-block"></div>
+            </div>
+            <button onclick="closeAchDrawer()"
+              style="position:absolute;top:14px;left:18px;background:var(--bs);border:none;border-radius:50%;width:34px;height:34px;font-size:1.1rem;cursor:pointer;color:var(--tl)">✕</button>
+            <div id="ach-drawer-body" style="padding:18px 24px 0"></div>
+          </div>
+        </div>
+
+        <section class="rewards-section scroll-reveal">
+          <h2><i class="fas fa-gift"></i> مكافآت وكوبونات</h2>
+          <div class="rewards-grid">
+            <div class="reward-item"><img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200&q=80"
+                alt="Gym">
+              <div class="reward-info">
+                <h4>خصم 50% اشتراك رياضي</h4>
+                <p>بلدية المملكة الأردنية الهاشمية</p>
+                <div class="price-tag"><i class="fas fa-coins"></i> 1250 نقطة</div>
+              </div><button class="btn-exchange" onclick="exchangeReward('اشتراك رياضي',1250)">تبديل الآن</button>
+            </div>
+            <div class="reward-item"><img src="https://images.unsplash.com/photo-1545259742-b4fe8fea3ff1?w=200&q=80"
+                alt="Electricity">
+              <div class="reward-info">
+                <h4>خصم على فاتورة الكهرباء</h4>
+                <p>شركة الكهرباء الأردنية</p>
+                <div class="price-tag"><i class="fas fa-coins"></i> 1250 نقطة</div>
+              </div><button class="btn-exchange" onclick="exchangeReward('خصم كهرباء',1250)">تبديل الآن</button>
+            </div>
+            <div class="reward-item"><img src="https://images.unsplash.com/photo-1589330694653-ded6df03f754?w=200&q=80"
+                alt="Certificate">
+              <div class="reward-info">
+                <h4>كتاب شكر وتقدير</h4>
+                <p>من رئيس البلدية</p>
+                <div class="price-tag"><i class="fas fa-coins"></i> 500 نقطة</div>
+              </div><button class="btn-exchange" onclick="exchangeReward('كتاب شكر',500)">تبديل الآن</button>
+            </div>
+          </div>
+        </section>
+        <footer
+          style="background:#0D1244;color:rgba(255,255,255,.7);text-align:center;padding:4rem 2rem;border-radius:50px 50px 0 0">
+          <div
+            style="font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:center;gap:10px">
+            <i class="fas fa-shield-alt"></i> عين المواطن
+          </div>
+          <p style="font-size:1rem;margin-bottom:1.5rem;opacity:.85">بناء المجتمعات يبدأ بوعي الأفراد</p>
+          <p>© 2026 منصة عين المواطن - مبادرة التحول الرقمي</p>
+        </footer>
+      </div>
+    </div>
+    <!-- ===== PAGE: PROFILE ===== -->
+    <div id="page-profile" class="page">
+      <div style="max-width:700px;margin:0 auto;padding:36px 18px">
+
+        <!-- Profile Header Banner -->
+        <div
+          style="background:linear-gradient(135deg,var(--p),var(--pm));border-radius:20px;padding:32px;color:#fff;margin-bottom:22px;text-align:center;position:relative;overflow:hidden">
+          <div
+            style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.06)">
+          </div>
+          <div
+            style="position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)">
+          </div>
+          <h2 style="font-size:1.4rem;font-weight:900;margin-bottom:4px">ملفك الشخصي</h2>
+          <p style="font-size:.85rem;opacity:.75">إدارة معلوماتك الشخصية وصورتك وبريدك الإلكتروني</p>
+        </div>
+
+        <!-- Photo & Name Section -->
+        <div class="white-box" style="text-align:center">
+          <div style="position:relative;display:inline-block;margin-bottom:18px">
+            <div id="profileAvatarWrap"
+              style="width:110px;height:110px;border-radius:50%;border:4px solid var(--p);overflow:hidden;margin:0 auto;background:var(--px);display:flex;align-items:center;justify-content:center;font-size:3rem;cursor:pointer"
+              onclick="document.getElementById('profilePhotoInput').click()">
+              <span id="profileAvatarEmoji">👤</span>
+              <img id="profileAvatarImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover">
+            </div>
+            <button onclick="document.getElementById('profilePhotoInput').click()"
+              style="position:absolute;bottom:4px;left:0;background:var(--g);color:var(--p);border:none;border-radius:50%;width:30px;height:30px;font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2)">📷</button>
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none"
+              onchange="changeProfilePhoto(this)">
+          </div>
+          <div id="profileNameDisplay" style="font-size:1.3rem;font-weight:900;color:var(--p);margin-bottom:4px">اسم
+            المواطن</div>
+          <div style="font-size:.82rem;color:var(--tl);margin-bottom:14px" id="profileRoleDisplay">مواطن مبادر — المملكة
+            الأردنية الهاشمية</div>
+          <div
+            style="display:inline-flex;align-items:center;gap:6px;background:var(--gl);color:#92600a;padding:5px 16px;border-radius:20px;font-size:.8rem;font-weight:700">
+            <i class="fas fa-coins" style="color:var(--g)"></i>
+            <span id="profilePtsDisplay">2,500 نقطة</span>
+          </div>
+        </div>
+
+        <!-- Citizen Name Section -->
+        <div class="white-box">
+          <p class="sec-title" style="margin-bottom:18px">👤 اسم المواطن</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div>
+              <label style="font-size:.79rem;font-weight:700;color:var(--tm);display:block;margin-bottom:5px">الاسم
+                الأول <span style="color:#c0392b">*</span></label>
+              <div style="position:relative">
+                <input id="profileFirstName" type="text" placeholder="الاسم الأول"
+                  style="width:100%;padding:10px 36px 10px 12px;border:1.5px solid var(--bd);border-radius:var(--r);font-family:Cairo,sans-serif;font-size:.88rem;color:var(--t);background:#fff;outline:none;direction:rtl"
+                  onfocus="this.style.borderColor='var(--pl)'" onblur="this.style.borderColor='var(--bd)'">
+                <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:.85rem">👤</span>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:.79rem;font-weight:700;color:var(--tm);display:block;margin-bottom:5px">اسم
+                الأب</label>
+              <div style="position:relative">
+                <input id="profileMidName" type="text" placeholder="اسم الأب"
+                  style="width:100%;padding:10px 36px 10px 12px;border:1.5px solid var(--bd);border-radius:var(--r);font-family:Cairo,sans-serif;font-size:.88rem;color:var(--t);background:#fff;outline:none;direction:rtl"
+                  onfocus="this.style.borderColor='var(--pl)'" onblur="this.style.borderColor='var(--bd)'">
+                <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:.85rem">👤</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:.79rem;font-weight:700;color:var(--tm);display:block;margin-bottom:5px">اسم العائلة
+              <span style="color:#c0392b">*</span></label>
+            <div style="position:relative">
+              <input id="profileLastName" type="text" placeholder="اسم العائلة"
+                style="width:100%;padding:10px 36px 10px 12px;border:1.5px solid var(--bd);border-radius:var(--r);font-family:Cairo,sans-serif;font-size:.88rem;color:var(--t);background:#fff;outline:none;direction:rtl"
+                onfocus="this.style.borderColor='var(--pl)'" onblur="this.style.borderColor='var(--bd)'">
+              <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:.85rem">👤</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Info Section -->
+        <div class="white-box">
+          <p class="sec-title" style="margin-bottom:18px">📬 معلومات التواصل</p>
+          <div style="margin-bottom:12px">
+            <label style="font-size:.79rem;font-weight:700;color:var(--tm);display:block;margin-bottom:5px">البريد
+              الإلكتروني</label>
+            <div style="position:relative">
+              <input id="profileEmail" type="email" placeholder="example@mail.com"
+                style="width:100%;padding:10px 36px 10px 12px;border:1.5px solid var(--bd);border-radius:var(--r);font-family:Cairo,sans-serif;font-size:.88rem;color:var(--t);background:#fff;outline:none;direction:ltr;text-align:right"
+                onfocus="this.style.borderColor='var(--pl)'" onblur="this.style.borderColor='var(--bd)'">
+              <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:.85rem">✉️</span>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:.79rem;font-weight:700;color:var(--tm);display:block;margin-bottom:5px">رقم
+              الهاتف</label>
+            <div style="position:relative">
+              <input id="profilePhone" type="tel" placeholder="07X-XXXXXXX"
+                style="width:100%;padding:10px 36px 10px 12px;border:1.5px solid var(--bd);border-radius:var(--r);font-family:Cairo,sans-serif;font-size:.88rem;color:var(--t);background:#fff;outline:none;direction:ltr;text-align:right"
+                onfocus="this.style.borderColor='var(--pl)'" onblur="this.style.borderColor='var(--bd)'">
+              <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:.85rem">📱</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photo Change Section -->
+        <div class="white-box">
+          <p class="sec-title" style="margin-bottom:14px">🖼️ تغيير الصورة الشخصية</p>
+          <div
+            style="border:2px dashed var(--bd);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s"
+            id="dropZone" onclick="document.getElementById('profilePhotoInput').click()"
+            onmouseover="this.style.borderColor='var(--pl)';this.style.background='var(--px)'"
+            onmouseout="this.style.borderColor='var(--bd)';this.style.background='transparent'">
+            <div style="font-size:2.5rem;margin-bottom:8px">📷</div>
+            <p style="font-size:.87rem;color:var(--tl);margin-bottom:4px">اضغط لاختيار صورة أو اسحب صورتك هنا</p>
+            <p style="font-size:.75rem;color:var(--tx)">PNG، JPG، WEBP — حد أقصى 5 ميجابايت</p>
+          </div>
+          <div id="photoPreviewArea" style="display:none;margin-top:14px;text-align:center">
+            <img id="photoPreview" src="" alt="معاينة"
+              style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--p);margin-bottom:8px">
+            <p style="font-size:.8rem;color:var(--a);font-weight:700">✅ تم اختيار الصورة</p>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <button onclick="saveProfile()"
+          style="width:100%;padding:14px;background:linear-gradient(135deg,var(--p),var(--pm));color:#fff;border:none;border-radius:12px;font-size:.97rem;font-weight:800;cursor:pointer;font-family:Cairo,sans-serif;box-shadow:0 4px 16px rgba(26,58,107,.3);transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px"
+          onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+          <i class="fas fa-save"></i> حفظ التغييرات
+        </button>
+      </div>
+    </div>
+
+  </div><!-- end appWrapper -->
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg">تمت العملية!</span></div>
+
+  <!-- MODAL -->
+  <div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+</body>
+
+</html>
